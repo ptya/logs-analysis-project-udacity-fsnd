@@ -9,9 +9,20 @@ import sys
 START_TIME = time.time()
 DBNAME = "news"
 
+def connect_db(db_name=DBNAME):
+    """Return connection to database and cursor."""
+    try:
+        conn = psycopg2.connect(database=DBNAME)
+        c = conn.cursor()
+        return conn, c
+    except:
+        print('I am unable to connect to the database')
+        sys.exit()
+
 
 def top_3_articles():
     """Return the top 3 articles, most viewed first."""
+    conn, c = connect_db()
     query = """
             SELECT title, count(path)::integer as views
             FROM articles, log
@@ -23,11 +34,13 @@ def top_3_articles():
             """
     c.execute(query)
     result = c.fetchall()
+    conn.close()
     return result
 
 
 def popular_authors():
     """Return the most popular authors, most viewed first."""
+    conn, c = connect_db()
     query = """
         SELECT authors.name, count(log.path)::integer as views
         FROM authors, articles, log
@@ -39,11 +52,13 @@ def popular_authors():
         """
     c.execute(query)
     result = c.fetchall()
+    conn.close()
     return result
 
 
 def error_days():
     """Return the days where error request count was above 1%."""
+    conn, c = connect_db()
     query = """
         WITH full_list AS (
             SELECT day, (errors::real/total::real) AS percentage
@@ -61,16 +76,9 @@ def error_days():
         """
     c.execute(query)
     result = c.fetchall()
+    conn.close()
     return result
 
-# Connect to database or exit program
-try:
-    conn = psycopg2.connect(database=DBNAME)
-except:
-    print('I am unable to connect to the database')
-    sys.exit()
-
-c = conn.cursor()
 
 # Welcome message
 print('\n## Fetching data. Please wait.. ##')
@@ -114,6 +122,5 @@ print(hdr3)
 for day, percent in msg3:
     print(day.strftime("%B %d, %Y") + ' — ' + '{:.2%}'.format(percent))
 
-conn.close()
 print('\n## End of program — runtime: %s seconds ##\n' %
       round((time.time() - START_TIME), 2))
