@@ -60,19 +60,13 @@ def error_days():
     """Return the days where error request count was above 1%."""
     conn, c = connect_db()
     query = """
-        WITH full_list AS (
-            SELECT day, (errors::real/total::real) AS percentage
-            FROM (SELECT time::date AS day,
-                    COUNT(status) FILTER
-                        (WHERE status NOT LIKE '%200%') AS errors,
-                    COUNT(status) AS total
-                  FROM log
-                  GROUP BY day
-                  ORDER BY day DESC) AS pretable
-        )
-        SELECT *
-        FROM full_list
-        WHERE percentage > 0.01;
+        SELECT day, errors/total AS percentage
+        FROM (SELECT time::date AS day,
+                     COUNT(status) AS total,
+                     SUM((status NOT LIKE '%200%')::int)::float AS errors
+              FROM log
+              GROUP BY day) AS pretable
+        WHERE errors/total > 0.01
         """
     c.execute(query)
     result = c.fetchall()
