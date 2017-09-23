@@ -24,11 +24,13 @@ def top_3_articles():
     """Return the top 3 articles, most viewed first."""
     conn, c = connect_db()
     query = """
-            SELECT title, count(path)::integer as views
-            FROM articles, log
-            WHERE path = '/article/' || slug
-            AND status LIKE ('200%')
-            GROUP BY title
+            SELECT title, views
+            FROM articles
+            INNER JOIN
+                (SELECT path, count(path)::integer AS views
+                 FROM log
+                 GROUP BY path) AS log
+            ON path = '/article/' || slug
             ORDER BY views DESC
             LIMIT 3
             """
@@ -42,13 +44,17 @@ def popular_authors():
     """Return the most popular authors, most viewed first."""
     conn, c = connect_db()
     query = """
-        SELECT authors.name, count(log.path)::integer as views
-        FROM authors, articles, log
-        WHERE log.path LIKE CONCAT('%', articles.slug, '%')
-              AND status LIKE ('200%')
-              AND authors.id = articles.author
+        SELECT authors.name, sum(views) AS total_views
+        FROM articles
+        INNER JOIN
+            (SELECT path, count(path)::integer AS views
+             FROM log
+             GROUP BY path) AS log
+        ON path = '/article/' || slug
+        INNER JOIN authors
+        ON authors.id = articles.author
         GROUP BY authors.name
-        ORDER BY views DESC
+        ORDER BY total_views DESC
         """
     c.execute(query)
     result = c.fetchall()
