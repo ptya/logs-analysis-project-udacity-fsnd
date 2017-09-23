@@ -26,7 +26,7 @@ def top_3_articles():
     query = """
             SELECT title, count(path)::integer as views
             FROM articles, log
-            WHERE path LIKE CONCAT('%', slug, '%')
+            WHERE path = '/article/' || slug
             AND status LIKE ('200%')
             GROUP BY title
             ORDER BY views DESC
