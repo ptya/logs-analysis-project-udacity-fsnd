@@ -5,9 +5,6 @@ import psycopg2
 import datetime
 import time
 
-START_TIME = time.time()
-DBNAME = "news"
-
 def connect_db(db_name=DBNAME):
     """Return connection to database and cursor.
 
@@ -44,8 +41,10 @@ def execute_query(query):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
+def main():
+    START_TIME = time.time()
+    DBNAME = "news"
 
-if __name__ == '__main__':
     # Welcome message
     print('\n## Fetching data. Please wait.. ##')
 
@@ -64,7 +63,7 @@ if __name__ == '__main__':
     ORDER BY views DESC
     LIMIT 3
     """
-    
+
     # Fetch rows
     msg1 = execute_query(query1)
 
@@ -145,3 +144,7 @@ if __name__ == '__main__':
     # Goodby message
     print('\n## End of program — runtime: %s seconds ##\n' %
           round((time.time() - START_TIME), 2))
+
+
+if __name__ == '__main__':
+    main()
