@@ -5,18 +5,18 @@ import psycopg2
 import datetime
 import time
 
-def connect_db(db_name=DBNAME):
+def connect_db(db_name='news'):
     """Return connection to database and cursor.
 
         args:
-            db_name - name of the database, default DBNAME
+            db_name - name of the database, default 'news'
 
         returns:
             Database connection
             Cursor to the database
     """
     try:
-        conn = psycopg2.connect(database=DBNAME)
+        conn = psycopg2.connect(database=db_name)
         c = conn.cursor()
         return conn, c
     except (Exception, psycopg2.DatabaseError) as error:
@@ -43,7 +43,6 @@ def execute_query(query):
 
 def main():
     START_TIME = time.time()
-    DBNAME = "news"
 
     # Welcome message
     print('\n## Fetching data. Please wait.. ##')
