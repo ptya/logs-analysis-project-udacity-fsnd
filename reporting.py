@@ -77,7 +77,7 @@ def main():
 
     # Print results
     for article, views in msg1:
-        print('"' + article + '" — ' + '{:,}'.format(views) + ' views')
+        print('{0} — {1:,} views'.format(article, views))
 
     # 2 - Most popular authors, most viewed first.
     # Output example:
@@ -110,7 +110,7 @@ def main():
 
     # Print results
     for author, views in msg2:
-        print(author + ' — ' + '{:,}'.format(views) + ' views')
+        print('{0} — {1:,} views'.format(author, views))
 
     # 3 - Days above 1% request errors
     # Output example:
@@ -139,7 +139,7 @@ def main():
 
     # Print results
     for day, percent in msg3:
-        print(day.strftime("%B %d, %Y") + ' — ' + '{:.2%}'.format(percent))
+        print('{0:%B %d, %Y} — {1:.2%}'.format(day, percent))
 
     # Goodby message
     print('\n## End of program — runtime: %s seconds ##\n' %
